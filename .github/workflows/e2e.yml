@@ -1,0 +1,48 @@
+name: Kubernetes E2E
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache-dependency-path: '**/go.sum'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.14.7'
+          terraform_wrapper: false
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.35.0'
+      - name: Install kind
+        run: |
+          curl --fail --silent --show-error --location https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64 -o /tmp/kind
+          chmod +x /tmp/kind
+          sudo mv /tmp/kind /usr/local/bin/kind
+      - run: make check
+      - run: make e2e
+      - name: Final cleanup
+        if: always()
+        run: make destroy
+      - name: Upload test results and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts
+          path: artifacts/
+          retention-days: 7

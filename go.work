@@ -1,0 +1,11 @@
+go 1.27.0
+
+use (
+ ./pkg/events
+ ./pkg/runtime
+ ./services/exchange
+ ./services/gateway
+ ./services/orders
+ ./services/pricing
+ ./services/settlement
+)

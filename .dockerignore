@@ -1,0 +1,9 @@
+.git
+.idea
+.tools
+.cache
+.run
+artifacts
+e2e/node_modules
+**/.terraform
+**/*.tfstate*
