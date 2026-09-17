@@ -8,7 +8,10 @@ export default defineConfig({
   testTimeout: 60_000,
   hookTimeout: 30_000,
   retry: 0,
-  reporters: ['default', 'junit'],
+  // 'verbose' prints every test's full name and pass/fail outcome, not just a per-file
+  // summary, so the log names each scenario (e.g. "rejects an over-balance withdrawal
+  // locally without calling Coinbase") as it runs.
+  reporters: ['verbose', 'junit'],
   outputFile: { junit: '../artifacts/e2e-junit.xml' },
  },
 });
